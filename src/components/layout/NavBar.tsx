@@ -21,7 +21,7 @@ export function NavBar({ title, showBack, onBack, right, transparent }: NavBarPr
         !transparent && 'bg-sand-100/90 backdrop-blur-xl',
       )}
     >
-      <div className="flex w-16 items-center">
+      <div className="flex w-20 items-center">
         {showBack && (
           <button
             type="button"
@@ -36,7 +36,7 @@ export function NavBar({ title, showBack, onBack, right, transparent }: NavBarPr
       {title && (
         <h1 className="flex-1 truncate text-center text-[15px] font-semibold text-ink-900">{title}</h1>
       )}
-      <div className="flex w-16 items-center justify-end">{right}</div>
+      <div className="flex w-20 items-center justify-end">{right}</div>
     </header>
   );
 }

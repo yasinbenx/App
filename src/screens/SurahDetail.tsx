@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { SlidersHorizontal, BookOpen } from 'lucide-react';
+import { SlidersHorizontal, BookOpen, Rows3, GalleryHorizontal } from 'lucide-react';
 import { NavBar } from '../components/layout/NavBar';
 import { ScreenScroll } from '../components/layout/ScreenScroll';
 import { AudioControlBar } from '../components/quran/AudioControlBar';
@@ -8,11 +8,10 @@ import { AyahPager } from '../components/quran/AyahPager';
 import { ClassicReader } from '../components/quran/ClassicReader';
 import { ReadingOptionsSheet } from '../components/quran/ReadingOptionsSheet';
 import { EmptyState } from '../components/ui/EmptyState';
-import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { getSurahById } from '../data/surahs';
 import { useAppState } from '../state/AppStateContext';
 import { useAudioPlayer } from '../state/AudioPlayerContext';
-import { useReadingMode, type ReadingMode } from '../state/ReadingModeContext';
+import { useReadingMode } from '../state/ReadingModeContext';
 
 const NO_BASMALA = new Set([1, 9]);
 
@@ -89,14 +88,29 @@ export function SurahDetail() {
         title={surah.nameGerman}
         right={
           hasFullContent && (
-            <button
-              type="button"
-              onClick={() => setOptionsOpen(true)}
-              className="tap-highlight-none flex h-9 w-9 items-center justify-center rounded-full text-ink-700 active:bg-sand-200"
-              aria-label="Leseoptionen"
-            >
-              <SlidersHorizontal size={18} strokeWidth={2} />
-            </button>
+            <div className="flex items-center gap-0.5">
+              <button
+                type="button"
+                onClick={() => setMode(mode === 'fokus' ? 'klassisch' : 'fokus')}
+                className="tap-highlight-none flex h-9 w-9 items-center justify-center rounded-full text-ink-500 active:bg-sand-200"
+                aria-label={mode === 'fokus' ? 'Zur klassischen Ansicht wechseln' : 'Zur Fokus-Ansicht wechseln'}
+                title={mode === 'fokus' ? 'Klassische Ansicht' : 'Fokus-Ansicht'}
+              >
+                {mode === 'fokus' ? (
+                  <Rows3 size={16} strokeWidth={2} />
+                ) : (
+                  <GalleryHorizontal size={16} strokeWidth={2} />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setOptionsOpen(true)}
+                className="tap-highlight-none flex h-9 w-9 items-center justify-center rounded-full text-ink-700 active:bg-sand-200"
+                aria-label="Leseoptionen"
+              >
+                <SlidersHorizontal size={18} strokeWidth={2} />
+              </button>
+            </div>
           )
         }
       />
@@ -104,20 +118,12 @@ export function SurahDetail() {
       {hasFullContent ? (
         <>
           <div className="px-5 pb-3 pt-1">
-            <div className="mb-3 flex flex-col items-center text-center">
+            <div className="flex flex-col items-center text-center">
               <p className="arabic-text mb-1 text-[26px] text-dome-700">{surah.nameArabic}</p>
               <p className="text-[12.5px] font-medium text-ink-400">
                 {surah.nameTransliteration} · {surah.revelationPlace} · {surah.ayahCount} Verse
               </p>
             </div>
-            <SegmentedControl<ReadingMode>
-              value={mode}
-              onChange={setMode}
-              options={[
-                { value: 'fokus', label: 'Fokus' },
-                { value: 'klassisch', label: 'Klassisch' },
-              ]}
-            />
           </div>
 
           {mode === 'fokus' ? (
