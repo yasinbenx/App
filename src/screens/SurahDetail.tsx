@@ -5,11 +5,14 @@ import { NavBar } from '../components/layout/NavBar';
 import { ScreenScroll } from '../components/layout/ScreenScroll';
 import { AudioControlBar } from '../components/quran/AudioControlBar';
 import { AyahPager } from '../components/quran/AyahPager';
+import { ClassicReader } from '../components/quran/ClassicReader';
 import { ReadingOptionsSheet } from '../components/quran/ReadingOptionsSheet';
 import { EmptyState } from '../components/ui/EmptyState';
+import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { getSurahById } from '../data/surahs';
 import { useAppState } from '../state/AppStateContext';
 import { useAudioPlayer } from '../state/AudioPlayerContext';
+import { useReadingMode, type ReadingMode } from '../state/ReadingModeContext';
 
 const NO_BASMALA = new Set([1, 9]);
 
@@ -19,6 +22,7 @@ export function SurahDetail() {
   const { readingPrefs, updateReadingPrefs, isAyahBookmarked, toggleBookmarkAyah, setLastRead, lastRead } =
     useAppState();
   const { current, pause, preload, play } = useAudioPlayer();
+  const { mode, setMode } = useReadingMode();
 
   const surah = getSurahById(Number(surahId));
   const hasFullContent = (surah?.ayahs?.length ?? 0) > 0;
@@ -36,7 +40,7 @@ export function SurahDetail() {
   }, [surah?.id, focusedAyahNumber]);
 
   useEffect(() => {
-    if (!surah || !hasFullContent) return;
+    if (!surah || !hasFullContent || mode !== 'fokus') return;
     preload(surah.id, focusedAyahNumber);
     const idx = surah.ayahs!.findIndex((a) => a.number === focusedAyahNumber);
     const next = surah.ayahs![idx + 1];
@@ -50,7 +54,7 @@ export function SurahDetail() {
     }
     didMountRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [surah?.id, focusedAyahNumber, hasFullContent]);
+  }, [surah?.id, focusedAyahNumber, hasFullContent, mode]);
 
   const handleWordTap = useCallback(
     (ayahNumber: number) => {
@@ -68,6 +72,15 @@ export function SurahDetail() {
       </div>
     );
   }
+
+  const trailingNotice = isPartial ? (
+    <div className="mx-5 rounded-[18px] bg-sand-200/60 px-4 py-4 text-center">
+      <p className="text-[13px] leading-relaxed text-ink-500">
+        Die restlichen {surah.ayahCount - surah.ayahs!.length} Verse dieser Sure werden in einer kommenden Version
+        ergänzt.
+      </p>
+    </div>
+  ) : undefined;
 
   return (
     <div className="relative flex h-full flex-col">
@@ -97,36 +110,54 @@ export function SurahDetail() {
                 {surah.nameTransliteration} · {surah.revelationPlace} · {surah.ayahCount} Verse
               </p>
             </div>
-            <AudioControlBar surahId={surah.id} ayahNumber={focusedAyahNumber} />
-            {!NO_BASMALA.has(surah.id) && (
-              <p className="arabic-text mt-4 text-center text-[19px] leading-relaxed text-dome-700">
-                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-              </p>
-            )}
+            <SegmentedControl<ReadingMode>
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'fokus', label: 'Fokus' },
+                { value: 'klassisch', label: 'Klassisch' },
+              ]}
+            />
           </div>
 
-          <AyahPager
-            ayahs={surah.ayahs!}
-            ayahCount={surah.ayahCount}
-            fontSize={readingPrefs.fontSize}
-            showTransliteration={readingPrefs.showTransliteration}
-            showTranslation={readingPrefs.showTranslation}
-            isAyahBookmarked={(n) => isAyahBookmarked(surah.id, n)}
-            onToggleBookmark={(n) => toggleBookmarkAyah(surah.id, n)}
-            onWordTap={handleWordTap}
-            initialAyahNumber={initialAyahNumber}
-            onFocusedAyahChange={setFocusedAyahNumber}
-            trailingNotice={
-              isPartial ? (
-                <div className="mx-5 rounded-[18px] bg-sand-200/60 px-4 py-4 text-center">
-                  <p className="text-[13px] leading-relaxed text-ink-500">
-                    Die restlichen {surah.ayahCount - surah.ayahs!.length} Verse dieser Sure werden in einer
-                    kommenden Version ergänzt.
+          {mode === 'fokus' ? (
+            <>
+              <div className="px-5 pb-3">
+                <AudioControlBar surahId={surah.id} ayahNumber={focusedAyahNumber} />
+                {!NO_BASMALA.has(surah.id) && (
+                  <p className="arabic-text mt-4 text-center text-[19px] leading-relaxed text-dome-700">
+                    بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                   </p>
-                </div>
-              ) : undefined
-            }
-          />
+                )}
+              </div>
+
+              <AyahPager
+                ayahs={surah.ayahs!}
+                ayahCount={surah.ayahCount}
+                fontSize={readingPrefs.fontSize}
+                showTransliteration={readingPrefs.showTransliteration}
+                showTranslation={readingPrefs.showTranslation}
+                isAyahBookmarked={(n) => isAyahBookmarked(surah.id, n)}
+                onToggleBookmark={(n) => toggleBookmarkAyah(surah.id, n)}
+                onWordTap={handleWordTap}
+                initialAyahNumber={initialAyahNumber}
+                onFocusedAyahChange={setFocusedAyahNumber}
+                trailingNotice={trailingNotice}
+              />
+            </>
+          ) : (
+            <ClassicReader
+              surahId={surah.id}
+              ayahs={surah.ayahs!}
+              fontSize={readingPrefs.fontSize}
+              showTransliteration={readingPrefs.showTransliteration}
+              showTranslation={readingPrefs.showTranslation}
+              showBismillah={!NO_BASMALA.has(surah.id)}
+              isAyahBookmarked={(n) => isAyahBookmarked(surah.id, n)}
+              onToggleBookmark={(n) => toggleBookmarkAyah(surah.id, n)}
+              trailingNotice={trailingNotice}
+            />
+          )}
         </>
       ) : (
         <ScreenScroll className="px-5 pb-10 pt-2">
