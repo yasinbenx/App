@@ -8,13 +8,6 @@ import { useAppState } from '../state/AppStateContext';
 import { getSurahById } from '../data/surahs';
 import { FEATURED_REMINDER } from '../data/reminders';
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 11) return 'Guten Morgen';
-  if (hour < 17) return 'Guten Tag';
-  return 'Guten Abend';
-}
-
 export function Home() {
   const navigate = useNavigate();
   const { lastRead } = useAppState();
@@ -50,10 +43,7 @@ export function Home() {
   return (
     <ScreenScroll className="px-5 pb-10 pt-4">
       <div className="mb-7 flex items-center justify-between">
-        <div>
-          <p className="text-[13px] font-medium text-ink-400">{getGreeting()},</p>
-          <h1 className="font-display text-[26px] font-semibold tracking-tight text-ink-900">Assalamu Alaikum</h1>
-        </div>
+        <h1 className="font-display text-[22px] font-semibold tracking-tight text-ink-900">Start</h1>
         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-dome-500 font-display text-[16px] font-semibold text-marble-50 shadow-[0_8px_20px_-10px_rgba(63,92,68,0.6)]">
           A
         </div>
