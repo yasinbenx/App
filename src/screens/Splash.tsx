@@ -49,13 +49,17 @@ export function Splash() {
 function Emblem() {
   return (
     <div className="flex h-20 w-20 items-center justify-center rounded-[26px] bg-gradient-to-br from-dome-500 to-dome-700 shadow-[0_16px_32px_-12px_rgba(63,92,68,0.5)]">
-      <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+      <svg width="36" height="36" viewBox="0 0 44 44" fill="none">
+        <mask id="emblem-crescent">
+          <rect width="44" height="44" fill="#000" />
+          <circle cx="21" cy="23" r="14" fill="#fff" />
+          <circle cx="27.5" cy="17" r="12.5" fill="#000" />
+        </mask>
+        <circle cx="21" cy="23" r="14" fill="#F6EFE1" mask="url(#emblem-crescent)" />
         <path
-          d="M21.5 4.5C16 6.8 12.2 12.1 12.2 18.2c0 8.1 6.2 13.8 13.8 13.3-3 2.8-7 4.5-11.4 4.5C5.3 36 0 30.7 0 24.4 0 15.4 7.4 8 16.4 8c1.9 0 3.7.3 5.1.5z"
-          fill="#F3ECDD"
-          transform="translate(0 -4)"
+          d="M31.5,7c.5,2.3,2,3.8,4.3,4.3-2.3.5-3.8,2-4.3,4.3-.5-2.3-2-3.8-4.3-4.3,2.3-.5,3.8-2,4.3-4.3Z"
+          fill="#DCBC7E"
         />
-        <circle cx="27" cy="9" r="2.1" fill="#DCBC7E" />
       </svg>
     </div>
   );
