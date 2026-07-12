@@ -1,4 +1,4 @@
-# Nur — Qur'an, Duas & Erinnerungen
+# Quba — Qur'an, Duas & Erinnerungen
 
 Ein deutschsprachiges MVP-Produkt für eine ruhige, fokussierte Qur'an- und
 Dua-Leseerfahrung. Medina-inspiriertes Farbklima (Sandbeige, gedämpftes

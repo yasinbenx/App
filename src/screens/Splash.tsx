@@ -19,7 +19,7 @@ export function Splash() {
       >
         <Emblem />
         <p className="mt-5 text-[14.5px] font-medium tracking-wide text-ink-400">Asalamu Alaykum</p>
-        <h1 className="mt-1.5 font-display text-[40px] font-semibold tracking-tight text-dome-700">Nur</h1>
+        <h1 className="mt-1.5 font-display text-[40px] font-semibold tracking-tight text-dome-700">Quba</h1>
         <p className="mt-3 max-w-[240px] text-[15px] leading-relaxed text-ink-500">
           Ruhe finden im Alltag — mit dem Qur’an, Duas und täglichen Erinnerungen.
         </p>
