@@ -107,7 +107,7 @@ export type AppScene = {
   kind: "app";
   url: string;
   appTitle: string;
-  habits: { label: string; emoji: string; done?: boolean; streak: number }[];
+  habits: { label: string; icon: "drop" | "book" | "walk" | "code"; done?: boolean; streak: number }[];
   /** Index der Gewohnheit, die abgehakt wird */
   checkIndex: number;
 };

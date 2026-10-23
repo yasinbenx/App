@@ -57,7 +57,16 @@ export const FollowCta: React.FC<{ frame: number; fps: number; text: string; sub
             transform: `translateY(${tap ? 8 : 0}px) scale(${followed ? 1 + 0.08 * (1 - pressed) : 1})`,
           }}
         >
-          {followed ? "✓ Gefolgt" : "+ Folgen"}
+          {followed ? (
+            <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <svg width={44} height={44} viewBox="0 0 24 24">
+                <path d="M4 12.5 L9.5 18 L20 6.5" stroke={COLORS.ink} strokeWidth={3.6} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Gefolgt
+            </span>
+          ) : (
+            "+ Folgen"
+          )}
         </div>
         <svg
           width={110}
