@@ -14,7 +14,7 @@ npx remotion render ep01-github out/ep01.mp4
 sonst listet es die benötigten Dateien. Selbst abgelegte Dateien mit `npm run sfx -- --normalize` angleichen.
 Fehlende Dateien werden beim Rendern einfach übersprungen.
 Die Dateien für Folge 1 stammen aus ElevenLabs Sound Effects (je eine Generierung, Pop/Klick auf den ersten
-Anschlag gekürzt, alles auf -16 dBFS Peak normalisiert). Mix-Lautstärken stehen in `src/sfx.ts`.
+Anschlag gekürzt, alles auf -3 dBFS Peak normalisiert). Mix-Lautstärken stehen in `src/sfx.ts`.
 
 ## Neue Folge
 1. `src/episodes/ep01-github.ts` kopieren, Szenen/Zeilen anpassen.

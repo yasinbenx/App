@@ -2,7 +2,7 @@
 // Aufruf:  ELEVENLABS_API_KEY=... npm run sfx      (vorhandene Dateien werden übersprungen)
 //          npm run sfx -- --force                  (alles neu erzeugen)
 //          npm run sfx -- --normalize              (nur selbst abgelegte Dateien normalisieren)
-// Jede Datei wird mit ffmpeg auf einen einheitlichen Peak (-16 dBFS) gebracht,
+// Jede Datei wird mit ffmpeg auf einen einheitlichen Peak (-3 dBFS) gebracht,
 // damit die Mix-Lautstärken in src/sfx.ts verlässlich sind.
 
 import { execFileSync, spawnSync } from "node:child_process";
@@ -10,7 +10,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { SFX } from "../src/sfx";
 
-const TARGET_PEAK_DB = -16;
+const TARGET_PEAK_DB = -3;
 const root = path.resolve(import.meta.dirname, "..");
 const key = process.env.ELEVENLABS_API_KEY;
 const force = process.argv.includes("--force");

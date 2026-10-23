@@ -10,7 +10,7 @@ export type SfxSpec = {
   prompt: string;
   /** Länge in Sekunden für die Generierung */
   seconds: number;
-  /** Basis-Lautstärke im Mix (0..1). Dateien werden vorher auf -16 dBFS Peak normalisiert. */
+  /** Basis-Lautstärke im Mix (0..1). Dateien werden vorher auf -3 dBFS Peak normalisiert. */
   volume: number;
 };
 
