@@ -14,7 +14,7 @@ export const ep02: Episode = {
   title: "Was ist das Terminal?",
   location: "cafe",
   targetFrames: [1800, 1830],
-  // Stimmen (ElevenLabs: Junge "Sam", Claude "Thomas – Warm German Explainer"), aufbereitet mit npm run voices
+  // Stimmen (ElevenLabs: Junge "Vibe Coding – Junge (neutral)", Claude "Emil Berger"), aufbereitet mit npm run voices
   voices: voices as VoiceClip[],
   scenes: [
     /* 1 ─ Establishing durch die verregnete Scheibe + Haken: Frage sofort */
@@ -181,7 +181,7 @@ export const ep02: Episode = {
           ],
           text: "Meistens kommt nur eine *Fehlermeldung*. Vorsicht nur bei *rm*, das löscht Dateien endgültig.",
         },
-        { type: "action", seconds: 1.2 },
+        { type: "action", seconds: 0.6 },
       ],
     },
 
@@ -241,7 +241,7 @@ export const ep02: Episode = {
           marks: [{ mark: "cc", at: "Claude Code", cues: [{ sfx: "keyboard", seconds: 0.4 }, { sfx: "success", at: 0.55, gain: 0.6 }] }],
           text: "Genau. Und *Claude Code* arbeitet genau dort drin.",
         },
-        { type: "action", seconds: 0.9 },
+        { type: "action", seconds: 0.6 },
       ],
     },
 
