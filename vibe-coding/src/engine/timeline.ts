@@ -1,6 +1,6 @@
 import { SFX, type SfxId } from "../sfx";
 import { TIMING, VIDEO } from "../theme";
-import type { Beat, Episode, LineBeat, Scene, TransitionType } from "./types";
+import type { Beat, Episode, LineBeat, Scene, TransitionType, VoiceClip } from "./types";
 
 const FPS = VIDEO.fps;
 const sec = (s: number) => Math.round(s * FPS);
@@ -25,6 +25,8 @@ export type TimedLine = LineBeat & {
   charFrames: number[];
   /** globaler Zeilen-Index in der Folge (für Varianz) */
   lineNo: number;
+  /** Stimme dieser Zeile (startet bei typeStart) */
+  voice?: VoiceClip;
 };
 
 export type TimedWait = Exclude<Beat, LineBeat> & { index: number; from: number; duration: number };
@@ -39,11 +41,13 @@ export type TimedScene = Scene & {
 };
 
 export type AbsCue = { sfx: SfxId; frame: number; volume: number; frames?: number };
+export type AbsVoice = { file: string; frame: number; frames: number };
 
 export type EpisodeTimeline = {
   scenes: TimedScene[];
   duration: number;
   cues: AbsCue[];
+  voices: AbsVoice[];
 };
 
 /** Tipp-Rhythmus: kleine Pausen nach Satzzeichen, damit es natürlich wirkt. */
@@ -64,16 +68,27 @@ export const typeSchedule = (text: string) => {
 /** Text ohne Hervorhebungs-Markup (*Wort*) */
 export const plain = (text: string) => text.replace(/\*/g, "");
 
-export const lineDuration = (line: LineBeat) => {
-  const { total } = typeSchedule(plain(line.text));
+/** Tipp-Rhythmus; mit Stimme so gestreckt, dass der Text im Sprechtempo erscheint */
+const scheduleFor = (text: string, voice?: VoiceClip) => {
+  const sched = typeSchedule(text);
+  if (!voice) return sched;
+  const target = voice.frames * 0.92;
+  const k = target > sched.total ? target / sched.total : 1;
+  return { frames: sched.frames.map((f) => f * k), total: Math.ceil(sched.total * k) };
+};
+
+export const lineDuration = (line: LineBeat, voice?: VoiceClip) => {
+  const { total } = scheduleFor(plain(line.text), voice);
   const read = (plain(line.text).length / TIMING.readCps + TIMING.readPad) * FPS;
-  const visible = Math.max(total + TIMING.minHold * FPS, read) + (line.hold ?? 0) * FPS;
+  const spoken = voice ? voice.frames + TIMING.voiceTail : 0;
+  const visible = Math.max(total + TIMING.minHold * FPS, read, spoken) + (line.hold ?? 0) * FPS;
   return TIMING.bubbleIn + Math.ceil(visible);
 };
 
 export const buildTimeline = (ep: Episode): EpisodeTimeline => {
   const scenes: TimedScene[] = [];
   const cues: AbsCue[] = [];
+  const voices: AbsVoice[] = [];
   let cursor = 0;
   let lineNo = 0;
 
@@ -90,8 +105,9 @@ export const buildTimeline = (ep: Episode): EpisodeTimeline => {
       prevFrom = t;
       let tb: TimedBeat;
       if (beat.type === "line") {
-        const sched = typeSchedule(plain(beat.text));
-        const duration = lineDuration(beat);
+        const voice = ep.voices?.[lineNo];
+        const sched = scheduleFor(plain(beat.text), voice);
+        const duration = lineDuration(beat, voice);
         tb = {
           ...beat,
           index,
@@ -101,14 +117,16 @@ export const buildTimeline = (ep: Episode): EpisodeTimeline => {
           typeEnd: t + TIMING.bubbleIn + sched.total,
           charFrames: sched.frames,
           lineNo: lineNo++,
+          voice,
         };
         cues.push({ sfx: "pop", frame: from + t, volume: SFX.pop.volume });
-        // Marken an Textstellen (im Lesetempo)
+        if (voice) voices.push({ file: voice.file, frame: from + t + TIMING.bubbleIn, frames: voice.frames });
+        // Marken an Textstellen: mit Stimme an der gesprochenen Stelle, sonst im Lesetempo
         const txt = plain(beat.text);
         for (const m of beat.marks ?? []) {
           const idx = txt.indexOf(m.at);
           if (idx < 0) throw new Error(`Marke "${m.mark}": Textstelle "${m.at}" nicht in "${txt}"`);
-          const f = t + TIMING.bubbleIn + Math.round((idx / TIMING.readCps) * FPS);
+          const f = t + TIMING.bubbleIn + (voice ? Math.round((idx / txt.length) * voice.frames) : Math.round((idx / TIMING.readCps) * FPS));
           marks[m.mark] = f;
           for (const c of m.cues ?? []) {
             cues.push({ sfx: c.sfx, frame: from + f + sec(c.at ?? 0), volume: SFX[c.sfx].volume * (c.gain ?? 1), frames: c.seconds ? sec(c.seconds) : undefined });
@@ -137,7 +155,13 @@ export const buildTimeline = (ep: Episode): EpisodeTimeline => {
     cursor = from + duration;
   });
 
-  return { scenes, duration: cursor, cues: cues.sort((a, b) => a.frame - b.frame) };
+  const duck = ep.voices ? TIMING.sfxDuckWithVoice : 1;
+  return {
+    scenes,
+    duration: cursor,
+    cues: cues.map((c) => ({ ...c, volume: c.volume * duck })).sort((a, b) => a.frame - b.frame),
+    voices,
+  };
 };
 
 /* ---------- Abfragen für Komponenten ---------- */

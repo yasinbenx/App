@@ -177,6 +177,9 @@ export type Scene = SceneBody & {
   beats: Beat[];
 };
 
+/** Sprachaufnahme einer Dialogzeile (erzeugt von scripts/voices.ts) */
+export type VoiceClip = { file: string; frames: number; env: number[] };
+
 export type Episode = {
   id: string;
   series: string;
@@ -188,5 +191,7 @@ export type Episode = {
   costumes?: Costumes;
   /** Ziel-Länge in Frames (Serienregel: 1800–1830) – wird von `npm run timeline` geprüft */
   targetFrames?: [number, number];
+  /** Optional: Stimmen je Dialogzeile (Reihenfolge = Reihenfolge der Zeilen). Ohne = nur Sprechblasen. */
+  voices?: VoiceClip[];
   scenes: Scene[];
 };

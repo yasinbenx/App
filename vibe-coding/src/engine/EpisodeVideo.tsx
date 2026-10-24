@@ -59,6 +59,12 @@ export const EpisodeVideo: React.FC<{ episode: Episode }> = ({ episode }) => {
         </TransitionSeries>
       </FontGate>
       <SfxTrack cues={tl.cues} />
+      {/* Stimmen (nur Folgen mit voices) */}
+      {tl.voices.map((v, i) => (
+        <Sequence key={`v${i}`} from={v.frame} durationInFrames={v.frames + 4} layout="none" name={`voice:${i + 1}`}>
+          <Audio src={staticFile(v.file)} />
+        </Sequence>
+      ))}
     </AbsoluteFill>
     </EpisodeContext.Provider>
   );

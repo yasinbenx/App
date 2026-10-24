@@ -67,7 +67,11 @@ export const actingFor = (who: Speaker, scene: TimedScene, frame: number): Actin
   const gestureW = clamp((frame - current.from) / 8) * clamp((end - frame) / 10);
   const rel = frame - current.typeStart;
   let mouth = 0;
-  if (rel >= 0 && frame < current.typeEnd) {
+  if (current.voice) {
+    // Lippensync: Lautstärke-Hüllkurve der Aufnahme (pro Frame, 0..1)
+    const v = rel >= 0 ? current.voice.env[rel] ?? 0 : 0;
+    mouth = v < 0.25 ? 0 : clamp((v - 0.2) * 1.5);
+  } else if (rel >= 0 && frame < current.typeEnd) {
     // Pause im Tipp-Rhythmus (nach Satzzeichen) → Mund zu
     const idx = current.charFrames.findIndex((f) => f > rel);
     const gap = idx > 0 ? current.charFrames[idx] - current.charFrames[idx - 1] : 1;

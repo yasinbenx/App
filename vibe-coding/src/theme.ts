@@ -58,4 +58,8 @@ export const TIMING = {
   minHold: 0.5,
   /** Pop-in der Blase bevor die erste Taste kommt (Frames) */
   bubbleIn: 5,
+  /** Folgen mit Stimme: Soundeffekte leiser mischen */
+  sfxDuckWithVoice: 0.55,
+  /** Folgen mit Stimme: Luft nach dem gesprochenen Satz (Frames) */
+  voiceTail: 8,
 };
