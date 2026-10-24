@@ -87,7 +87,8 @@ export const actingFor = (who: Speaker, scene: TimedScene, frame: number): Actin
     gesture: current.gesture ?? "explain",
     gestureT: frame - current.from,
     gestureW,
-    talking: mouth > 0,
+    // mit Stimme: während der ganzen Aufnahme "sprechend" (kein Mimik-Flackern in Atempausen)
+    talking: current.voice ? rel >= 0 && rel < current.voice.frames : mouth > 0,
     look: who === "boy" ? 0.15 : -0.15,
   };
 };
