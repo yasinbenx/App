@@ -42,6 +42,6 @@ const picks = tl.scenes.map((sc) => {
   return { id: sc.id, frame: sc.from + (l ? l.from + l.duration - 8 : Math.round(sc.duration / 2)) };
 });
 const select = picks.map((p) => `eq(n\\,${p.frame})`).join("+");
-execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", file, "-vf", `select='${select}',scale=360:-1,tile=${picks.length}x1`, "-frames:v", "1", path.join(outDir, "szenen.png")]);
-console.log(`· Standbilder: ${path.join(outDir, "szenen.png")} (${picks.map((p) => `${p.id}@${p.frame}`).join(", ")})`);
+execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", file, "-vf", `select='${select}',scale=360:-1,tile=${picks.length}x1`, "-frames:v", "1", path.join(outDir, `szenen-${ep.id}.png`)]);
+console.log(`· Standbilder: ${path.join(outDir, `szenen-${ep.id}.png`)} (${picks.map((p) => `${p.id}@${p.frame}`).join(", ")})`);
 process.exit(failed ? 1 : 0);

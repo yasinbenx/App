@@ -72,26 +72,38 @@ const Wipe: React.FC<TransitionPresentationComponentProps<P>> = ({ children, pre
   );
 };
 
-/* ---------- Glitch: kurzer digitaler Störer (RGB-Versatz + Streifen) ---------- */
+/* ---------- Glitch: kurzer digitaler Störer (Streifen-Versatz + RGB-Split) ----------
+   Rendert die Szene nur EINMAL und verzerrt sie per SVG-Filter – funktioniert daher auch mit 3D. */
 const Glitch: React.FC<TransitionPresentationComponentProps<P>> = ({ children, presentationDirection, presentationProgress }) => {
   const p = presentationProgress;
   const visible = presentationDirection === "exiting" ? p < 0.5 : p >= 0.5;
   if (!visible) return null;
   const k = Math.sin(p * Math.PI); // Stärke, Maximum in der Mitte
   const seed = Math.floor(p * 12);
-  const slices = Array.from({ length: 7 }, (_, i) => {
-    const r = Math.sin((seed + 1) * (i + 3) * 12.9898) * 43758.5453;
-    const f = r - Math.floor(r);
-    return { top: i * (100 / 7), h: 100 / 7, dx: (f - 0.5) * 220 * k };
-  });
+  const id = `glitch-${presentationDirection}`;
+  const split = 16 * k;
   return (
     <AbsoluteFill>
-      {slices.map((s, i) => (
-        <AbsoluteFill key={i} style={{ clipPath: `inset(${s.top}% 0 ${100 - s.top - s.h}% 0)`, transform: `translateX(${s.dx}px)` }}>
-          {children}
-        </AbsoluteFill>
-      ))}
-      <AbsoluteFill style={{ background: `linear-gradient(90deg, rgba(255,0,80,${0.25 * k}), transparent 30%, transparent 70%, rgba(0,220,255,${0.25 * k}))`, mixBlendMode: "screen" }} />
+      <svg width={0} height={0} style={{ position: "absolute" }}>
+        <filter id={id} x="-10%" y="0" width="120%" height="100%" colorInterpolationFilters="sRGB">
+          {/* horizontale Störstreifen: Rauschen nur in y-Richtung */}
+          <feTurbulence type="fractalNoise" baseFrequency="0 0.035" numOctaves={1} seed={seed} result="noise" />
+          <feComponentTransfer in="noise" result="bands">
+            <feFuncR type="discrete" tableValues="0 0.5 0.5 1 0.5 0 0.5 0.5" />
+            <feFuncA type="linear" slope={0} intercept={0.5} />
+          </feComponentTransfer>
+          <feDisplacementMap in="SourceGraphic" in2="bands" scale={k * 180} xChannelSelector="R" yChannelSelector="A" result="disp" />
+          {/* RGB-Split */}
+          <feOffset in="disp" dx={split} result="r0" />
+          <feColorMatrix in="r0" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+          <feColorMatrix in="disp" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
+          <feOffset in="disp" dx={-split} result="b0" />
+          <feColorMatrix in="b0" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
+          <feComposite in="r" in2="g" operator="arithmetic" k2={1} k3={1} result="rg" />
+          <feComposite in="rg" in2="b" operator="arithmetic" k2={1} k3={1} />
+        </filter>
+      </svg>
+      <AbsoluteFill style={{ filter: k > 0.05 ? `url(#${id})` : undefined }}>{children}</AbsoluteFill>
       <AbsoluteFill
         style={{
           backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 2px, transparent 2px 6px)",

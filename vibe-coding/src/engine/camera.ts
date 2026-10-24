@@ -47,6 +47,7 @@ const mix = (a: Shot, b: Shot, t: number): Shot => ({
   y: a.y + (b.y - a.y) * t,
   dist: a.dist + (b.dist - a.dist) * t,
   roll: (a.roll ?? 0) + ((b.roll ?? 0) - (a.roll ?? 0)) * t,
+  pitch: (a.pitch ?? 0) + ((b.pitch ?? 0) - (a.pitch ?? 0)) * t,
 });
 
 const ease = Easing.bezier(0.65, 0, 0.35, 1);

@@ -17,7 +17,8 @@ export type Gesture =
   | "wave"; // winkt
 
 /** Kameraposition in Weltkoordinaten (Bühne). dist = Abstand zur Ebene z=0 */
-export type Shot = { x: number; y: number; dist: number; roll?: number };
+/** pitch (Radiant, negativ = nach unten) nur für Detail-Aufsichten ohne Sprechblase; der 2D-Hintergrund wird dabei ausgeblendet */
+export type Shot = { x: number; y: number; dist: number; roll?: number; pitch?: number };
 
 /** "establish" = Eröffnungs-Totale des Ortes (kommt aus der Location) */
 export type ShotName = "establish" | "wide" | "twoShot" | "boyClose" | "boyMedium" | "claudeClose" | "claudeMedium" | "deskTop";
@@ -93,11 +94,15 @@ export type StageOverlay =
   /** kleiner Serien-Chip + Thema oben (Establishing) */
   | { type: "series"; mark: string; kicker: string; title: string; until?: string }
   /** große Zahl/Aussage oben im Bild */
-  | { type: "stat"; mark: string; big: string; label: string; until?: string }
+  | { type: "stat"; mark: string; big: string; label: string; icon?: BadgeIcon; until?: string }
+  /** Vergleich links ↔ rechts (rechts erscheint bei rightMark oder kurz danach) */
+  | { type: "compare"; mark: string; rightMark?: string; until?: string; left: CompareSide; right: CompareSide }
   /** Symbol-Abzeichen, die einzeln aufploppen (je eigene Marke) */
   | { type: "badges"; items: { label: string; icon: BadgeIcon; mark: string }[]; until?: string };
 
-export type BadgeIcon = "folder" | "clock" | "eye" | "rocket";
+export type CompareSide = { icon: BadgeIcon; label: string; note?: string; good?: boolean };
+
+export type BadgeIcon = "folder" | "clock" | "eye" | "rocket" | "mouse" | "terminal" | "remote" | "trash";
 
 export type StageScene = {
   kind: "stage";
@@ -136,7 +141,30 @@ export type CardsScene = {
   cards: { title: string; text: string; icon: BadgeIcon; mark: string }[];
 };
 
-export type SceneBody = StageScene | BrowserScene | TerminalScene | AppScene | CardsScene;
+export type ShellOutput = string | { text: string; kind?: "error" | "claude" | "ok" | "muted" };
+
+export type TreeNode = { name: string; children?: TreeNode[] };
+
+export type ShellStep = {
+  /** Marke, ab der der Befehl getippt wird */
+  mark: string;
+  command: string;
+  output?: ShellOutput[];
+  /** Wirkung im Ordnerbaum: ls = Inhalt aufleuchten, cd = "Du bist hier" wandert, mkdir = neuer Ordner wächst */
+  tree?: { ls?: boolean; cd?: string; mkdir?: string };
+  /** Warnschild statt Ausführen (z. B. bei rm) */
+  warn?: { title: string; text: string };
+};
+
+/** Großes Terminal mit mehreren Befehlen, optional mit Ordnerbaum darunter */
+export type ShellScene = {
+  kind: "shell";
+  cwd: string[];
+  tree?: TreeNode;
+  steps: ShellStep[];
+};
+
+export type SceneBody = StageScene | BrowserScene | TerminalScene | AppScene | CardsScene | ShellScene;
 
 export type Scene = SceneBody & {
   id: string;

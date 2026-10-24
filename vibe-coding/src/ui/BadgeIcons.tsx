@@ -26,6 +26,34 @@ export const BadgeIconSvg: React.FC<{ icon: BadgeIcon; frame: number; size: numb
         <path d="M17 24 L13 28 L17 32 M31 24 L35 28 L31 32" />
       </g>
     )}
+    {icon === "mouse" && (
+      <g>
+        <rect x={14} y={6} width={20} height={34} rx={10} fill={COLORS.paper} />
+        <path d="M24 6 V18 M14 18 H34" />
+        <rect x={22} y={10} width={4} height={6} rx={2} fill={COLORS.coral} stroke="none" />
+      </g>
+    )}
+    {icon === "terminal" && (
+      <g>
+        <rect x={4} y={8} width={40} height={32} rx={5} fill="#1B1430" />
+        <path d="M12 18 L18 24 L12 30" stroke={COLORS.green} />
+        <path d="M22 31 H32" stroke={COLORS.star} />
+      </g>
+    )}
+    {icon === "remote" && (
+      <g>
+        <rect x={15} y={3} width={18} height={42} rx={6} fill={COLORS.paper} />
+        <circle cx={24} cy={11} r={3.2} fill={COLORS.coral} />
+        <circle cx={24} cy={23} r={5} fill="#4C9BE8" />
+        <path d="M20 33 H22 M26 33 H28 M20 38 H22 M26 38 H28" />
+      </g>
+    )}
+    {icon === "trash" && (
+      <g>
+        <path d="M12 14 H36 L33 42 H15 Z" fill={COLORS.paper} />
+        <path d="M8 13 H40 M19 9 H29 V13 M20 20 V36 M28 20 V36" />
+      </g>
+    )}
     {icon === "eye" && (
       <g>
         <path d="M3 24 Q24 4 45 24 Q24 44 3 24 Z" fill={COLORS.paper} />

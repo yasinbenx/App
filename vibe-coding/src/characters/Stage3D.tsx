@@ -18,9 +18,9 @@ const CameraRig: React.FC<{ cam: Shot }> = ({ cam }) => {
     camera.near = 0.1;
     camera.far = 100;
     camera.position.set(cam.x, cam.y, cam.dist);
-    camera.rotation.set(0, 0, 0);
+    camera.rotation.set(cam.pitch ?? 0, 0, 0);
     camera.updateProjectionMatrix();
-  }, [camera, cam.x, cam.y, cam.dist]);
+  }, [camera, cam.x, cam.y, cam.dist, cam.pitch]);
   return null;
 };
 

@@ -13,6 +13,8 @@ export type Location = {
   bg: string;
   /** 2D-Hintergrund in Tiefenebenen (Parallax über Billboard) */
   Background: React.FC<{ cam: Shot; frame: number }>;
+  /** Optional: Ebene vor allem (z. B. Regentropfen auf einer Scheibe), sieht die Kamera */
+  Foreground?: React.FC<{ cam: Shot; frame: number }>;
   /** 3D-Set: Tisch/Theke, Möbel, Requisiten */
   Set3D: React.FC<{ frame: number }>;
   /** Beleuchtung des Ortes */

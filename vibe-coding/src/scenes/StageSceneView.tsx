@@ -7,7 +7,7 @@ import { activeLine, linesOf, type TimedScene } from "../engine/timeline";
 import type { StageScene } from "../engine/types";
 import { FolderCloud } from "../overlays/FolderCloud";
 import { FollowCta } from "../overlays/FollowCta";
-import { BadgesOverlay, SeriesChip, StatOverlay } from "../overlays/SmallOverlays";
+import { BadgesOverlay, CompareOverlay, SeriesChip, StatOverlay } from "../overlays/SmallOverlays";
 import { TitleCard } from "../overlays/TitleCard";
 import { SAFE } from "../theme";
 import { SpeechBubble } from "../ui/SpeechBubble";
@@ -36,22 +36,26 @@ export const StageSceneView: React.FC<Props> = ({ scene }) => {
       : project(cam, STAGE.claude.x, STAGE.claude.y + STAGE.claude.r + 0.34, 0.2);
 
   // Solange oben eine Einblendung steht (Chip, Zahl), bleiben Blasen darunter
-  const RESERVE = { series: 150, stat: 300 } as const;
+  const RESERVE = { series: 150, stat: 300, compare: 400 } as const;
   const minTop =
     SAFE.top +
     Math.max(
       10,
       ...(scene.overlays ?? []).map((o) =>
-        (o.type === "series" || o.type === "stat") && frame >= mark(o.mark) - 8 && frame < until(o.until) ? RESERVE[o.type] : 0,
+        (o.type === "series" || o.type === "stat" || o.type === "compare") && frame >= mark(o.mark) - 8 && frame < until(o.until) ? RESERVE[o.type] : 0,
       ),
     );
 
   return (
     <AbsoluteFill style={{ overflow: "hidden", background: location.bg }}>
       <AbsoluteFill style={{ transform: `translate(${sh.x}px, ${sh.y}px) rotate(${cam.roll ?? 0}deg) scale(${1 + Math.abs(cam.roll ?? 0) * 0.02 + shake * 0.02})` }}>
-        <location.Background cam={cam} frame={frame} />
+        {/* Bei geneigter Kamera (Detail-Aufsicht) passt die 2D-Parallaxe nicht – dann ausblenden */}
+        <div style={{ position: "absolute", inset: 0, opacity: Math.max(0, 1 - Math.abs(cam.pitch ?? 0) / 0.25) }}>
+          <location.Background cam={cam} frame={frame} />
+        </div>
         <Stage3D cam={cam} boy={boy} claude={claude} frame={frame} location={location} costumes={costumes} />
         <AbsoluteFill style={{ background: location.grade, pointerEvents: "none" }} />
+        {location.Foreground && <location.Foreground cam={cam} frame={frame} />}
         {scene.overlays?.map((o, i) => {
           if (o.type === "badges") {
             const items = o.items.map((it) => ({ ...it, start: mark(it.mark) }));
@@ -67,7 +71,11 @@ export const StageSceneView: React.FC<Props> = ({ scene }) => {
             case "series":
               return <SeriesChip key={i} frame={local} outAt={outAt} fps={fps} kicker={o.kicker} title={o.title} />;
             case "stat":
-              return <StatOverlay key={i} frame={local} outAt={outAt} fps={fps} big={o.big} label={o.label} />;
+              return <StatOverlay key={i} frame={local} outAt={outAt} fps={fps} big={o.big} label={o.label} icon={o.icon} />;
+            case "compare":
+              return (
+                <CompareOverlay key={i} frame={local} rightAt={(o.rightMark ? mark(o.rightMark) : start + 18) - start} outAt={outAt} fps={fps} left={o.left} right={o.right} />
+              );
             case "folderCloud":
               return <FolderCloud key={i} frame={local} outAt={Number.isFinite(outAt) ? outAt : scene.duration - start} fps={fps} />;
             case "follow":

@@ -2,6 +2,7 @@ import type { TimedScene } from "../engine/timeline";
 import { AppSceneView } from "./AppSceneView";
 import { BrowserSceneView } from "./BrowserSceneView";
 import { CardsSceneView } from "./CardsSceneView";
+import { ShellSceneView } from "./ShellSceneView";
 import { StageSceneView } from "./StageSceneView";
 import { TerminalSceneView } from "./TerminalSceneView";
 
@@ -18,5 +19,7 @@ export const SceneView: React.FC<{ scene: TimedScene }> = ({ scene }) => {
       return <AppSceneView scene={scene} />;
     case "cards":
       return <CardsSceneView scene={scene} />;
+    case "shell":
+      return <ShellSceneView scene={scene} />;
   }
 };
