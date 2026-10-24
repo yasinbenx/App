@@ -1,4 +1,5 @@
-import type { Episode } from "../engine/types";
+import type { Episode, VoiceClip } from "../engine/types";
+import voices from "./voices/ep02-terminal.json";
 
 /**
  * Vibe Coding Deutsch – Folge 2
@@ -13,6 +14,8 @@ export const ep02: Episode = {
   title: "Was ist das Terminal?",
   location: "cafe",
   targetFrames: [1800, 1830],
+  // Stimmen (ElevenLabs: Junge "Sam", Claude "Thomas – Warm German Explainer"), aufbereitet mit npm run voices
+  voices: voices as VoiceClip[],
   scenes: [
     /* 1 ─ Establishing durch die verregnete Scheibe + Haken: Frage sofort */
     {
@@ -21,7 +24,7 @@ export const ep02: Episode = {
       camera: { shot: "establish", drift: 0 },
       overlays: [{ type: "series", mark: "open", until: "chipOut", kicker: "VIBE CODING · FOLGE 2", title: "Was ist das Terminal?" }],
       leadIn: 0.25,
-      tail: 0.6,
+      tail: 0.2,
       beats: [
         {
           type: "line",
@@ -45,8 +48,8 @@ export const ep02: Episode = {
       overlays: [{ type: "stat", mark: "term", big: "TERMINAL", label: "Computer steuern per Text", icon: "terminal" }],
       tail: 0.4,
       beats: [
-        { type: "pause", seconds: 1.1 },
-        { type: "pause", seconds: 0.7, camera: { shot: { x: 0.62, y: 2.0, dist: 4.0 }, seconds: 0.7, drift: 0.07 }, cues: [{ sfx: "whoosh", gain: 0.6 }] },
+        { type: "pause", seconds: 0.6 },
+        { type: "pause", seconds: 0.5, camera: { shot: { x: 0.62, y: 2.0, dist: 4.0 }, seconds: 0.5, drift: 0.07 }, cues: [{ sfx: "whoosh", gain: 0.6 }] },
         {
           type: "line",
           speaker: "claude",
@@ -84,7 +87,7 @@ export const ep02: Episode = {
           right: { icon: "terminal", label: "Tippen", note: "erreicht alles", good: true },
         },
       ],
-      tail: 1.3,
+      tail: 0.3,
       beats: [
         {
           type: "line",
@@ -107,7 +110,7 @@ export const ep02: Episode = {
       transition: { type: "cut" },
       camera: { shot: "boyMedium", mode: "cut", punch: true, drift: 0.08 },
       leadIn: 0.1,
-      tail: 0.4,
+      tail: 0.2,
       beats: [{ type: "line", speaker: "boy", emotion: "excited", gesture: "explain", cues: [{ sfx: "boom", at: -0.1, gain: 0.45 }], text: "Okay. Und wie fange ich *an*?" }],
     },
 
@@ -139,7 +142,7 @@ export const ep02: Episode = {
           ],
           text: "Drei Befehle reichen: *ls* zeigt die Dateien, *cd* wechselt den Ordner, *mkdir* legt einen neuen an.",
         },
-        { type: "action", seconds: 2.8, mark: "ls2", cues: [{ sfx: "keyboard", at: 0.0, seconds: 0.3 }, { sfx: "success", at: 0.45, gain: 0.7 }] },
+        { type: "action", seconds: 1.0, mark: "ls2", cues: [{ sfx: "keyboard", at: 0.0, seconds: 0.3 }, { sfx: "success", at: 0.45, gain: 0.7 }] },
       ],
     },
 
@@ -152,7 +155,7 @@ export const ep02: Episode = {
       leadIn: 0.1,
       tail: 0.2,
       beats: [
-        { type: "action", seconds: 1.0, react: { who: "boy", emotion: "thinking", gesture: "scratch" } },
+        { type: "action", seconds: 0.4, react: { who: "boy", emotion: "thinking", gesture: "scratch" } },
         { type: "line", speaker: "boy", emotion: "confused", gesture: "shrug", text: "Und wenn ich etwas *Falsches* tippe?" },
       ],
     },
@@ -178,7 +181,7 @@ export const ep02: Episode = {
           ],
           text: "Meistens kommt nur eine *Fehlermeldung*. Vorsicht nur bei *rm*, das löscht Dateien endgültig.",
         },
-        { type: "action", seconds: 2.2 },
+        { type: "action", seconds: 1.2 },
       ],
     },
 
@@ -190,7 +193,7 @@ export const ep02: Episode = {
       camera: { shot: "boyClose", mode: "cut", punch: true, drift: 0.1 },
       leadIn: 0.05,
       tail: 0.05,
-      beats: [{ type: "action", seconds: 1.1, react: { who: "boy", emotion: "surprised", gesture: "wow" }, cues: [{ sfx: "boom", gain: 0.3 }] }],
+      beats: [{ type: "action", seconds: 0.8, react: { who: "boy", emotion: "surprised", gesture: "wow" }, cues: [{ sfx: "boom", gain: 0.3 }] }],
     },
 
     /* 9 ─ Glitch: Junge fasst zusammen: Junge fasst zusammen, "FERNBEDIENUNG" */
@@ -200,7 +203,7 @@ export const ep02: Episode = {
       transition: { type: "glitch" },
       camera: { shot: "boyMedium", drift: 0.06 },
       overlays: [{ type: "stat", mark: "remote", big: "FERNBEDIENUNG", label: "für deinen Computer", icon: "remote" }],
-      tail: 0.7,
+      tail: 0.2,
       beats: [
         {
           type: "line",
@@ -211,17 +214,6 @@ export const ep02: Episode = {
           text: "Also ist das Terminal eine *Fernbedienung* für meinen Computer?",
         },
       ],
-    },
-
-    /* 9b ─ Gegenschnitt: Claude nickt begeistert */
-    {
-      id: "nicken",
-      kind: "stage",
-      transition: { type: "cut" },
-      camera: { shot: "claudeClose", mode: "cut", drift: 0.08 },
-      leadIn: 0.05,
-      tail: 0.05,
-      beats: [{ type: "action", seconds: 1.0, react: { who: "claude", emotion: "happy", gesture: "wow" } }],
     },
 
     /* 10 ─ Einblendung: Claude Code im Terminal */
@@ -249,7 +241,7 @@ export const ep02: Episode = {
           marks: [{ mark: "cc", at: "Claude Code", cues: [{ sfx: "keyboard", seconds: 0.4 }, { sfx: "success", at: 0.55, gain: 0.6 }] }],
           text: "Genau. Und *Claude Code* arbeitet genau dort drin.",
         },
-        { type: "action", seconds: 2.3 },
+        { type: "action", seconds: 0.9 },
       ],
     },
 
@@ -262,7 +254,7 @@ export const ep02: Episode = {
       leadIn: 0.1,
       tail: 0.2,
       beats: [
-        { type: "action", seconds: 0.6, react: { who: "boy", emotion: "excited", gesture: "wow" }, cues: [{ sfx: "boom", gain: 0.4 }] },
+        { type: "action", seconds: 0.35, react: { who: "boy", emotion: "excited", gesture: "wow" }, cues: [{ sfx: "boom", gain: 0.4 }] },
         { type: "line", speaker: "boy", emotion: "excited", gesture: "wow", text: "Krass. Dann will ich das *ausprobieren*!" },
       ],
     },
@@ -284,7 +276,7 @@ export const ep02: Episode = {
           mark: "follow",
           cues: [{ sfx: "click", at: 0.9 }],
           text: "Mach das. Und folge mir für *Folge 3*.",
-          hold: 2.3,
+          hold: 0.6,
         },
       ],
     },

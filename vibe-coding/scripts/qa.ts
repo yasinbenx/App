@@ -31,7 +31,7 @@ const loud = spawnSync("ffmpeg", ["-hide_banner", "-i", file, "-af", "ebur128=pe
 const lufs = Number(loud.match(/I:\s+(-?[\d.]+) LUFS/g)?.pop()?.match(/-?[\d.]+/)?.[0]);
 const peak = Number(loud.match(/Peak:\s+(-?[\d.]+) dBFS/g)?.pop()?.match(/-?[\d.]+/)?.[0]);
 check(peak <= -1, `True Peak ${peak} dBFS (≤ -1, nichts übersteuert)`);
-console.log(`· Lautheit ${lufs} LUFS (nur Soundeffekte, keine Musik/Stimme)`);
+console.log(`· Lautheit ${lufs} LUFS${ep.voices ? " (mit Stimmen)" : " (nur Soundeffekte)"}`);
 
 // Ein Standbild pro Szene (Mitte jeder Zeile bzw. Szenenmitte)
 const tl = buildTimeline(ep);
