@@ -1,4 +1,5 @@
-import { Composition } from "remotion";
+import { Composition, Still } from "remotion";
+import { Logo } from "./Logo";
 import { EpisodeVideo } from "./engine/EpisodeVideo";
 import { buildTimeline } from "./engine/timeline";
 import { EPISODES } from "./episodes";
@@ -18,5 +19,8 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={buildTimeline(ep).duration}
       />
     ))}
+    {/* Profilbild (npx remotion still logo out/logo.png) */}
+    <Still id="logo" component={Logo} defaultProps={{ withText: false }} width={1080} height={1080} />
+    <Still id="logo-text" component={Logo} defaultProps={{ withText: true }} width={1080} height={1080} />
   </>
 );

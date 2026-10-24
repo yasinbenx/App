@@ -34,7 +34,12 @@ const pose = (g: Gesture, t: number): ArmPose => {
 };
 
 /** Claude – in jeder Folge identisch. Requisiten nur über `accessories`. */
-export const Claude3D: React.FC<{ acting: Acting; frame: number; accessories?: ClaudeAccessory[] }> = ({ acting, frame, accessories = [] }) => {
+export const Claude3D: React.FC<{ acting: Acting; frame: number; accessories?: ClaudeAccessory[]; shadow?: boolean }> = ({
+  acting,
+  frame,
+  accessories = [],
+  shadow = true,
+}) => {
   const { emotion, mouth, gestureW: w, gestureT, blink, look } = acting;
   const bob = Math.sin(frame / 14) * 0.035;
   const talkBounce = acting.talking ? Math.abs(Math.sin(frame / 4.2)) * 0.025 : 0;
@@ -54,7 +59,7 @@ export const Claude3D: React.FC<{ acting: Acting; frame: number; accessories?: C
   return (
     <group>
       {/* weicher Schatten auf dem Tisch */}
-      <mesh position={[x, STAGE.deskTop + 0.045, 0.32]} rotation={[-Math.PI / 2, 0, 0]} scale={1 - bob * 2}>
+      <mesh visible={shadow} position={[x, STAGE.deskTop + 0.045, 0.32]} rotation={[-Math.PI / 2, 0, 0]} scale={1 - bob * 2}>
         <circleGeometry args={[0.3, 16]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.28} />
       </mesh>
