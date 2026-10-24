@@ -1,6 +1,7 @@
 import type { Acting } from "../engine/acting";
 import type { Gesture } from "../engine/types";
 import { STAGE } from "../engine/camera";
+import { type BoyAccessory, BoyBodyAccessories, BoyHeadAccessories } from "./accessories";
 import { lerp, Mat } from "./materials";
 
 const SKIN = "#F2C29E";
@@ -72,7 +73,8 @@ const Arm: React.FC<{ side: 1 | -1; pose: ArmPose }> = ({ side, pose }) => (
   </group>
 );
 
-export const Boy3D: React.FC<{ acting: Acting; frame: number }> = ({ acting, frame }) => {
+/** Der Junge – in jeder Folge identisch. Requisiten nur über `accessories`. */
+export const Boy3D: React.FC<{ acting: Acting; frame: number; accessories?: BoyAccessory[] }> = ({ acting, frame, accessories = [] }) => {
   const { emotion, mouth, gestureW, gestureT, blink, look } = acting;
   const r = rest(frame);
   const g = gesturePose(acting.gesture, gestureT, frame);
@@ -95,11 +97,6 @@ export const Boy3D: React.FC<{ acting: Acting; frame: number }> = ({ acting, fra
 
   return (
     <group position={[STAGE.boy.x, lift, 0]}>
-      {/* Stuhllehne */}
-      <mesh position={[0, 1.08, -0.34]}>
-        <boxGeometry args={[0.78, 0.86, 0.08]} />
-        <Mat color="#3B2F57" />
-      </mesh>
       {/* Oberkörper (Hoodie) */}
       <mesh position={[0, 1.0 + breathe, 0]} scale={[1, 1, 0.82]}>
         <cylinderGeometry args={[0.27, 0.35, 0.62, 7]} />
@@ -191,8 +188,10 @@ export const Boy3D: React.FC<{ acting: Acting; frame: number }> = ({ acting, fra
             </mesh>
           ))}
           <Mouth y={-0.135} z={0.285} open={mouth} smile={happy && mouth < 0.1} oh={surprised && mouth < 0.1} />
+          <BoyHeadAccessories items={accessories} />
         </group>
       </group>
+      <BoyBodyAccessories items={accessories} />
     </group>
   );
 };

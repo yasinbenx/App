@@ -49,7 +49,9 @@ export const SpeechBubble: React.FC<{
   /** Frame, ab dem die Blase wieder verschwindet (nächste Zeile / Szenenende) */
   exitAt?: number;
   mouth?: number;
-}> = ({ line, frame, fps, layout, exitAt = Infinity, mouth = 0 }) => {
+  /** Oberkante nicht höher als (z. B. wenn oben ein Chip steht) */
+  minTop?: number;
+}> = ({ line, frame, fps, layout, exitAt = Infinity, mouth = 0, minTop = SAFE.top + 10 }) => {
   const mask = emphasisMask(line.text);
   const { lines, width, height, st } = measureBubble(line.text, layout.mode);
   const n = typedCount(line, frame);
@@ -77,7 +79,7 @@ export const SpeechBubble: React.FC<{
     const a = layout.anchor;
     left = Math.round(Math.min(Math.max(a.x - width / 2, SAFE.left), SAFE_BOX.rightX - width));
     const bottom = Math.min(a.y - 60, SAFE_BOX.bottomY);
-    top = Math.max(SAFE.top + 10, bottom - height);
+    top = Math.max(minTop, bottom - height);
     const baseX = Math.min(Math.max(a.x, left + 90), left + width - 90);
     const tipY = Math.min(top + height + 70, a.y - 10);
     tail = { x: baseX + (a.x - baseX) * 0.5 + (a.x > baseX ? 10 : a.x < baseX ? -10 : 0), y: tipY, baseX };

@@ -21,8 +21,10 @@ export const BrowserSceneView: React.FC<{ scene: TimedScene & BrowserScene }> = 
   const { fps } = useVideoConfig();
   const tq = scene.marks.typeQuery ?? 30;
   const ts = scene.marks.search ?? tq + 45;
-  const tr = scene.marks.results ?? ts + 12;
-  const typeFrames = ts - tq - 4;
+  // Suchtext tippt zügig (max. ~1 s), Ergebnisse/Hervorhebung folgen eigenen Marken
+  const typeFrames = Math.max(8, Math.min(ts - tq - 4, 30));
+  const tShow = scene.marks.results ?? ts + 6;
+  const tRepo = scene.marks.repo ?? tShow + 30;
 
   return (
     <InsertShell scene={scene}>
@@ -30,12 +32,12 @@ export const BrowserSceneView: React.FC<{ scene: TimedScene & BrowserScene }> = 
         const n = Math.round(interpolate(frame, [tq + 2, tq + 2 + typeFrames], [0, scene.query.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
         const typed = scene.query.slice(0, n);
         const focused = frame >= tq;
-        const showResults = frame >= ts + 6;
+        const showResults = frame >= tShow;
         // Mauszeiger: kommt von unten rechts zum Suchfeld, dann zum Button
         const cx = interpolate(frame, [tq - 20, tq, ts - 8, ts], [700, 360, 360, 690], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
         const cy = interpolate(frame, [tq - 20, tq, ts - 8, ts], [700, 168, 168, 160], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
         const pressed = frame >= ts && frame < ts + 5;
-        const highlight = spring({ frame: frame - (tr + 30), fps, config: { damping: 12 } });
+        const highlight = spring({ frame: frame - tRepo, fps, config: { damping: 12 } });
 
         return (
           <BrowserChrome url={scene.url}>
@@ -92,11 +94,11 @@ export const BrowserSceneView: React.FC<{ scene: TimedScene & BrowserScene }> = 
               {/* Ergebnisse */}
               {showResults && (
                 <div style={{ marginTop: 30 }}>
-                  <div style={{ fontSize: 30, fontWeight: 800, color: COLORS.ghMuted, marginBottom: 16, opacity: spring({ frame: frame - ts - 6, fps }) }}>
+                  <div style={{ fontSize: 30, fontWeight: 800, color: COLORS.ghMuted, marginBottom: 16, opacity: spring({ frame: frame - tShow, fps }) }}>
                     {scene.resultsLabel}
                   </div>
                   {scene.results.map((r, i) => {
-                    const p = spring({ frame: frame - ts - 8 - i * 5, fps, config: { damping: 14, stiffness: 160 } });
+                    const p = spring({ frame: frame - tShow - 2 - i * 5, fps, config: { damping: 14, stiffness: 160 } });
                     const isFirst = i === 0;
                     return (
                       <div

@@ -17,8 +17,10 @@ Die Dateien für Folge 1 stammen aus ElevenLabs Sound Effects (je eine Generieru
 Anschlag gekürzt, alles auf -3 dBFS Peak normalisiert). Mix-Lautstärken stehen in `src/sfx.ts`.
 
 ## Neue Folge
-1. `src/episodes/ep01-github.ts` kopieren, Szenen/Zeilen anpassen.
-2. In `src/episodes/index.ts` eintragen.
+Regeln: siehe [SERIENREGELN.md](SERIENREGELN.md).
+1. Neuen Ort anlegen: `src/locations/nightRoom.tsx` als Vorlage kopieren, in `src/locations/index.ts` eintragen.
+2. `src/episodes/ep01-github.ts` kopieren, `location`, `costumes`, Szenen und Dialog anpassen, in `src/episodes/index.ts` eintragen.
+3. `npm run timeline` bis alle Regeln ✓ sind, dann rendern und `npm run qa -- out/<datei>.mp4`.
 
 ## Ohne Chrome-Download (Sandbox/CI)
 `REMOTION_BROWSER=/pfad/zu/chrome-headless-shell npx remotion render …`

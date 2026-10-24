@@ -15,13 +15,13 @@ export const TerminalSceneView: React.FC<{ scene: TimedScene & TerminalScene }> 
   const { fps } = useVideoConfig();
   const tc = scene.marks.typeCmd ?? 60;
   const tl = scene.marks.clone ?? tc + 50;
-  const typeFrames = tl - tc - 4;
+  const typeFrames = Math.max(10, Math.min(tl - tc - 4, 48));
 
   return (
     <InsertShell scene={scene}>
       {(frame) => {
         const n = Math.round(interpolate(frame, [tc + 1, tc + 1 + typeFrames], [0, scene.command.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
-        const typing = frame >= tc && frame < tl;
+        const typing = frame >= tc && frame < tc + typeFrames;
         const running = frame >= tl;
         const caret = !running && Math.floor(frame / 8) % 2 === 0;
         const step = 5;

@@ -2,6 +2,7 @@ import type { Acting } from "../engine/acting";
 import type { Gesture } from "../engine/types";
 import { STAGE } from "../engine/camera";
 import { Mouth } from "./Boy3D";
+import { type ClaudeAccessory, ClaudeAccessories } from "./accessories";
 import { lerp, Mat, useStarGeometry } from "./materials";
 
 const CORAL = "#D97757";
@@ -32,7 +33,8 @@ const pose = (g: Gesture, t: number): ArmPose => {
   }
 };
 
-export const Claude3D: React.FC<{ acting: Acting; frame: number }> = ({ acting, frame }) => {
+/** Claude – in jeder Folge identisch. Requisiten nur über `accessories`. */
+export const Claude3D: React.FC<{ acting: Acting; frame: number; accessories?: ClaudeAccessory[] }> = ({ acting, frame, accessories = [] }) => {
   const { emotion, mouth, gestureW: w, gestureT, blink, look } = acting;
   const bob = Math.sin(frame / 14) * 0.035;
   const talkBounce = acting.talking ? Math.abs(Math.sin(frame / 4.2)) * 0.025 : 0;
@@ -68,7 +70,7 @@ export const Claude3D: React.FC<{ acting: Acting; frame: number }> = ({ acting, 
           <Mat color="#E58C6B" rough={0.7} />
         </mesh>
         {/* Stern */}
-        <group position={[0, r + 0.15 + Math.sin(frame / 9) * 0.015, 0]} rotation={[0, Math.sin(frame / 25) * 0.6, Math.sin(frame / 17) * 0.12]}>
+        <group position={[0, r + 0.15 + (accessories.includes("chefHat") ? 0.32 : 0) + Math.sin(frame / 9) * 0.015, 0]} rotation={[0, Math.sin(frame / 25) * 0.6, Math.sin(frame / 17) * 0.12]}>
           <mesh geometry={starGeo}>
             <Mat color={STAR} emissive="#FFB020" emissiveIntensity={0.55} rough={0.5} />
           </mesh>
@@ -105,6 +107,7 @@ export const Claude3D: React.FC<{ acting: Acting; frame: number }> = ({ acting, 
           </mesh>
         ))}
         <Mouth y={-0.08} z={r - 0.02} open={mouth} smile={!acting.talking && !surprised} oh={surprised && mouth < 0.1} size={1.05} />
+        <ClaudeAccessories items={accessories} r={r} />
         {/* Ärmchen */}
         {[
           { s: -1, rz: armL, rx: lerp(idle.Lx, g.Lx, w) },

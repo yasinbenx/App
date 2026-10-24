@@ -1,4 +1,4 @@
-import { activeLine, type TimedScene } from "./timeline";
+import { activeBeat, activeLine, type TimedScene } from "./timeline";
 import type { Emotion, Gesture, Speaker } from "./types";
 
 export type Acting = {
@@ -41,6 +41,19 @@ export const actingFor = (who: Speaker, scene: TimedScene, frame: number): Actin
     look: who === "boy" ? 0.25 : -0.25,
     blink: blinkAt(frame, seed),
   };
+  // Reaktions-Shot ohne Text
+  const beat = activeBeat(scene, frame);
+  if (beat && beat.type !== "line" && beat.react && beat.react.who === who && frame < beat.from + beat.duration) {
+    const end = beat.from + beat.duration;
+    return {
+      ...base,
+      emotion: beat.react.emotion ?? "surprised",
+      gesture: beat.react.gesture ?? "none",
+      gestureT: frame - beat.from,
+      gestureW: clamp((frame - beat.from) / 6) * clamp((end - frame) / 8),
+      look: 0,
+    };
+  }
   if (!current) return base;
 
   if (current.speaker !== who) {

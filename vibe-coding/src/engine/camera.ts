@@ -19,6 +19,7 @@ export const STAGE = {
 };
 
 export const SHOTS: Record<ShotName, Shot> = {
+  establish: { x: 0.2, y: 2.4, dist: 9 },
   wide: { x: 0.18, y: 2.12, dist: 6.6 },
   twoShot: { x: 0.12, y: 1.98, dist: 5.4 },
   boyClose: { x: -0.5, y: 1.72, dist: 3.0 },
@@ -28,7 +29,10 @@ export const SHOTS: Record<ShotName, Shot> = {
   deskTop: { x: -0.4, y: 1.3, dist: 2.4 },
 };
 
-export const resolveShot = (s: ShotRef): Shot => (typeof s === "string" ? SHOTS[s] : s);
+type ShotOverrides = Partial<Record<ShotName, Shot>>;
+
+export const resolveShot = (s: ShotRef, overrides: ShotOverrides = {}): Shot =>
+  typeof s === "string" ? (overrides[s] ?? SHOTS[s]) : s;
 
 /** Pixel pro Welteinheit in Tiefe z */
 export const ppu = (cam: Shot, z: number) => H / 2 / ((cam.dist - z) * TAN);
@@ -48,7 +52,7 @@ const mix = (a: Shot, b: Shot, t: number): Shot => ({
 const ease = Easing.bezier(0.65, 0, 0.35, 1);
 
 /** Liefert Kamera + Shake/Punch-Infos einer Bühnenszene zu einem (szenenlokalen) Frame. */
-export const cameraAt = (scene: TimedScene & { camera: CameraChange }, frame: number) => {
+export const cameraAt = (scene: TimedScene & { camera: CameraChange }, frame: number, overrides: ShotOverrides = {}) => {
   type Change = CameraChange & { at: number; until: number };
   const changes: Change[] = [{ ...scene.camera, at: 0, until: scene.duration }];
   for (const b of scene.timedBeats) {
@@ -57,14 +61,14 @@ export const cameraAt = (scene: TimedScene & { camera: CameraChange }, frame: nu
   // Ende der Gültigkeit = Beginn der nächsten Änderung
   for (let i = 0; i < changes.length - 1; i++) changes[i].until = changes[i + 1].at;
 
-  let prev: Shot = resolveShot(changes[0].shot);
+  let prev: Shot = resolveShot(changes[0].shot, overrides);
   let cam = prev;
   let punch = 0;
   let shake = 0;
   for (let i = 0; i < changes.length; i++) {
     const c = changes[i];
     if (frame < c.at) break;
-    const target = resolveShot(c.shot);
+    const target = resolveShot(c.shot, overrides);
     const local = frame - c.at;
     const moveFrames = Math.max(1, Math.round((c.seconds ?? 0.8) * 30));
     const t = c.mode === "cut" || i === 0 ? 1 : ease(Math.min(1, local / moveFrames));

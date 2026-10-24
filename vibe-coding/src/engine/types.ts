@@ -1,3 +1,5 @@
+import type { Costumes } from "../characters/accessories";
+import type { LocationId } from "../locations";
 import type { SfxId } from "../sfx";
 
 export type Speaker = "boy" | "claude";
@@ -17,7 +19,8 @@ export type Gesture =
 /** Kameraposition in Weltkoordinaten (Bühne). dist = Abstand zur Ebene z=0 */
 export type Shot = { x: number; y: number; dist: number; roll?: number };
 
-export type ShotName = "wide" | "twoShot" | "boyClose" | "boyMedium" | "claudeClose" | "claudeMedium" | "deskTop";
+/** "establish" = Eröffnungs-Totale des Ortes (kommt aus der Location) */
+export type ShotName = "establish" | "wide" | "twoShot" | "boyClose" | "boyMedium" | "claudeClose" | "claudeMedium" | "deskTop";
 
 export type ShotRef = ShotName | Shot;
 
@@ -60,12 +63,19 @@ export type LineBeat = BeatBase & {
   gesture?: Gesture;
   /** Zusätzliche Standzeit in Sekunden */
   hold?: number;
+  /**
+   * Marken an Textstellen: feuern, wenn der Zuschauer die Stelle liest (Lesetempo TIMING.readCps),
+   * z. B. { mark: "card2", at: "jede Version" }. Optional mit Soundcues relativ zur Marke.
+   */
+  marks?: { mark: string; at: string; cues?: Cue[] }[];
 };
 
 export type WaitBeat = BeatBase & {
   /** "action" = etwas passiert im Bild (Tippen, Klick, Titel ...), "pause" = Luft holen */
   type: "action" | "pause";
   seconds: number;
+  /** Reaktions-Shot: Figur zeigt Mimik/Geste ohne Text */
+  react?: { who: Speaker; emotion?: Emotion; gesture?: Gesture };
 };
 
 export type Beat = LineBeat | WaitBeat;
@@ -79,7 +89,15 @@ export type Transition = { type: TransitionType; seconds?: number; direction?: "
 export type StageOverlay =
   | { type: "title"; mark: string; kicker: string; title: string; subtitle?: string; until?: string }
   | { type: "folderCloud"; mark: string; until?: string }
-  | { type: "follow"; mark: string; text: string; sub?: string };
+  | { type: "follow"; mark: string; text: string; sub?: string }
+  /** kleiner Serien-Chip + Thema oben (Establishing) */
+  | { type: "series"; mark: string; kicker: string; title: string; until?: string }
+  /** große Zahl/Aussage oben im Bild */
+  | { type: "stat"; mark: string; big: string; label: string; until?: string }
+  /** Symbol-Abzeichen, die einzeln aufploppen (je eigene Marke) */
+  | { type: "badges"; items: { label: string; icon: BadgeIcon; mark: string }[]; until?: string };
+
+export type BadgeIcon = "folder" | "clock" | "eye" | "rocket";
 
 export type StageScene = {
   kind: "stage";
@@ -115,7 +133,7 @@ export type AppScene = {
 export type CardsScene = {
   kind: "cards";
   heading: string;
-  cards: { title: string; text: string; icon: "rocket" | "clock" | "eye"; mark: string }[];
+  cards: { title: string; text: string; icon: BadgeIcon; mark: string }[];
 };
 
 export type SceneBody = StageScene | BrowserScene | TerminalScene | AppScene | CardsScene;
@@ -136,5 +154,11 @@ export type Episode = {
   series: string;
   number: number;
   title: string;
+  /** Drehort dieser Folge (src/locations) */
+  location: LocationId;
+  /** Requisiten für die Figuren in dieser Folge */
+  costumes?: Costumes;
+  /** Ziel-Länge in Frames (Serienregel: 1800–1830) – wird von `npm run timeline` geprüft */
+  targetFrames?: [number, number];
   scenes: Scene[];
 };

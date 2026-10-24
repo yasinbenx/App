@@ -49,13 +49,13 @@ export const FONT = {
 /** Dialog-Timing */
 export const TIMING = {
   /** Tippgeschwindigkeit der Sprechblasen (Zeichen/Sekunde) */
-  typeCps: 32,
+  typeCps: 42,
   /** Mindest-Lesezeit: Blase steht insgesamt mindestens Zeichen/readCps Sekunden */
-  readCps: 17,
+  readCps: 20,
   /** Zusätzliche Standzeit nach der Mindest-Lesezeit (s) */
-  readPad: 0.2,
+  readPad: 0.1,
   /** Mindest-Standzeit nach dem Ende des Tippens (s) */
-  minHold: 0.6,
+  minHold: 0.5,
   /** Pop-in der Blase bevor die erste Taste kommt (Frames) */
   bubbleIn: 5,
 };

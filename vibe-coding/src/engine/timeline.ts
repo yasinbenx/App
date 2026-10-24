@@ -103,6 +103,17 @@ export const buildTimeline = (ep: Episode): EpisodeTimeline => {
           lineNo: lineNo++,
         };
         cues.push({ sfx: "pop", frame: from + t, volume: SFX.pop.volume });
+        // Marken an Textstellen (im Lesetempo)
+        const txt = plain(beat.text);
+        for (const m of beat.marks ?? []) {
+          const idx = txt.indexOf(m.at);
+          if (idx < 0) throw new Error(`Marke "${m.mark}": Textstelle "${m.at}" nicht in "${txt}"`);
+          const f = t + TIMING.bubbleIn + Math.round((idx / TIMING.readCps) * FPS);
+          marks[m.mark] = f;
+          for (const c of m.cues ?? []) {
+            cues.push({ sfx: c.sfx, frame: from + f + sec(c.at ?? 0), volume: SFX[c.sfx].volume * (c.gain ?? 1), frames: c.seconds ? sec(c.seconds) : undefined });
+          }
+        }
       } else {
         tb = { ...beat, index, from: t, duration: sec(beat.seconds) };
       }
@@ -144,6 +155,13 @@ export const activeLine = (scene: TimedScene, frame: number) => {
     }
   }
   return { current, next };
+};
+
+/** Beat, der gerade läuft (letzter begonnener) */
+export const activeBeat = (scene: TimedScene, frame: number) => {
+  let cur: TimedBeat | null = null;
+  for (const b of scene.timedBeats) if (b.from <= frame) cur = b;
+  return cur;
 };
 
 /** Anzahl getippter Zeichen */

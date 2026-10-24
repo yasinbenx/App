@@ -4,6 +4,7 @@ import { AbsoluteFill, Audio, getStaticFiles, Sequence, staticFile } from "remot
 import { SceneView } from "../scenes/SceneView";
 import { SFX } from "../sfx";
 import { FontGate } from "../ui/fonts";
+import { EpisodeContext, episodeContext } from "./context";
 import { buildTimeline } from "./timeline";
 import { presentationFor } from "./transitions";
 import type { Episode } from "./types";
@@ -36,8 +37,10 @@ const SfxTrack: React.FC<{ cues: ReturnType<typeof buildTimeline>["cues"] }> = (
 
 export const EpisodeVideo: React.FC<{ episode: Episode }> = ({ episode }) => {
   const tl = useMemo(() => buildTimeline(episode), [episode]);
+  const ctx = useMemo(() => episodeContext(episode), [episode]);
   return (
-    <AbsoluteFill style={{ background: "#0B0E26" }}>
+    <EpisodeContext.Provider value={ctx}>
+    <AbsoluteFill style={{ background: ctx.location.bg }}>
       <FontGate>
         <TransitionSeries>
           {tl.scenes.map((scene, i) => (
@@ -57,5 +60,6 @@ export const EpisodeVideo: React.FC<{ episode: Episode }> = ({ episode }) => {
       </FontGate>
       <SfxTrack cues={tl.cues} />
     </AbsoluteFill>
+    </EpisodeContext.Provider>
   );
 };
